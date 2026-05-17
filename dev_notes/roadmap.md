@@ -74,10 +74,12 @@ Lisa-feedback arc on docx + charts is substantially complete:
 
 What's still open from this arc:
 
-- **v2 chart recipes.** `gacc_bilateral_aggregate_yoy*`,
-  `mirror_gap*`, `hs_group_trajectory*`, `partner_share*`. Demand-
-  driven — pick up when Lisa asks for one or a real cycle
-  surfaces a gap.
+- **v2 chart recipes** (partial — see design doc § "v2 addendum").
+  Per-reporter bar (Option 1) and bilateral summary bar (Option 2)
+  shipped 2026-05-16 to give Lisa varied surfaces to react to.
+  Three families still deferred: `mirror_gap*`,
+  `hs_group_trajectory*`, `partner_share*`. Demand-driven from
+  here — wait for Lisa's reaction before committing to more.
 - **v3 Drive upload.** Waiting on Guardian GCP project access
   restoration (requested 2026-05-16; expected early week of
   2026-05-17). Spike spec at

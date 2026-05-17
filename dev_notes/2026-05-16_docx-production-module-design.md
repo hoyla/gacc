@@ -478,6 +478,73 @@ is set.
 - `sheets_export.py` unchanged from v1's Charts tab work — that
   surface is already feature-complete and well-tested.
 
+## v2 addendum — chart variety (added 2026-05-16 late evening)
+
+### Trigger
+
+Luke flagged that the v4 .docx output had only one chart type
+visually (the rolling-12mo line chart). The spike had shown two
+shapes — a deliberate editorial decision to give Lisa
+varied surfaces to react to was preferable to waiting for her to
+specify in the abstract.
+
+### What landed
+
+Two new chart shapes, both as additions to the existing top-N
+chart-lookup pipeline (no architectural changes; the translator's
+`chart_for_finding` callable already returned `list[bytes]` so
+multiple charts per finding were supported):
+
+**Option 1 — per-reporter grouped bar for top movers.** Each
+`hs_group_yoy*` top mover now gets TWO charts:
+1. Existing rolling-12mo line (prior + current 12mo monthly series).
+2. New grouped bar showing the top-5 reporters by absolute YoY
+   delta — prior 12mo (grey) vs current 12mo (red). Answers Lisa's
+   likely "which country is driving the move?" follow-up.
+
+Data source: each finding's `detail.per_reporter_breakdown` field
+(populated by Phase 6.11 in `anomalies._build_per_reporter_breakdown`).
+No new SQL.
+
+**Option 2 — bilateral summary bar for top GACC bilateral findings.**
+New finding family covered: `gacc_bilateral_aggregate_yoy` +
+`gacc_bilateral_aggregate_yoy_import`. Selection: top-N
+latest-anchor bilaterals by |yoy_pct|, filtered to ≥5pp move
+(matches Tier 1 diff's material-shift cutoff).
+
+Chart shape: two-bar prior-vs-current 12mo grouped chart with €
+value annotations, partner label + flow direction + YoY % +
+direction arrow in the title. Simpler than the hs_group_yoy
+line chart because bilaterals are headline-figure findings —
+turning two abstract percentages into € magnitudes is the
+editorial win.
+
+### Result against real data
+
+20 findings charted (10 hs_group_yoy top movers + 10 bilaterals),
+30 total chart objects (10 × 2 + 10 × 1). File size grew from
+672KB to 1.1MB — still well within Drive upload limits.
+
+### Status
+
+**Options 1 and 2 COMPLETE — 2026-05-16 late evening.** Two commits:
+
+- `caa8efd` — Option 1 (per-reporter bar) + chart_for_finding
+  list-based API + 11 new/updated tests.
+- `b68ded9` — Option 2 (bilateral summary bar) + 10 new tests.
+
+Full suite: 345 passing (+18 new since v4-complete), 5 skipped,
+0 regressions.
+
+### What's left for v2
+
+The original v2 scope listed four chart families:
+`gacc_bilateral_aggregate_yoy*` (done), `mirror_gap*` (deferred),
+`hs_group_trajectory*` (deferred), `partner_share*` (deferred).
+
+Lisa-eyeball-driven from here — wait for her to react to the
+current variety before committing to more shapes.
+
 After v1 closes, the path forward is unchanged: v2 (more chart
 recipes, demand-driven), v3 (Drive upload, OAuth-gated), v4 (full
 markdown-content parity, demand-driven).
