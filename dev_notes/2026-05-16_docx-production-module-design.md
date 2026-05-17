@@ -435,9 +435,48 @@ via the `finding/{id}` token already present in the markdown
 
 ### Status
 
-In progress 2026-05-16 evening — implementation commits land
-incrementally; the design captures the *why*, the commits capture
-the *what*.
+**v4 COMPLETE — 2026-05-16 evening.** Eight commits land the work:
+
+- `713a337` — design addendum (this section)
+- `11783d3` — scaffold `briefing_pack/md_to_docx.py`
+- `910b5b2` — core block + inline handlers
+- `f4baa7b` — GFM tables with alignment + inline runs
+- `26fdb10` — integrate translator into `briefing_pack/docx.py`,
+  full content + charts with first-occurrence-only guard
+- `ff10df9` — rename `render_top_movers_docx` → `render_findings_docx`
+  + update integration tests for v4 shape
+- `f181419` — 22 focused unit tests for the translator
+- `2498b1f` — silence matplotlib categorical-units INFO logs
+
+End-to-end verified against today's DB: 438KB markdown → 672KB
+docx, 4331 paragraphs (1 H1 + 14 H2 + 98 H3 + 179 H4 + 53 normal +
+8 numbered + 3978 bullets), 10 inline charts (one per top-mover
+finding, first-occurrence-only).
+
+Full test suite: 327 passing (+22 translator unit tests +
+adjustments to existing docx integration tests for the v4 shape),
+5 skipped, 0 regressions.
+
+mistune added as a new dependency (3.2.1). python-docx, matplotlib,
+mistune are now soft dependencies — only imported when `--docx`
+is set.
+
+### Architecture in place after v4
+
+- `briefing_pack/render.py` orchestrator unchanged conceptually:
+  renders markdown via the existing section modules, writes
+  `03_Findings.md`. When `docx=True`, additionally invokes the
+  docx pipeline.
+- `briefing_pack/docx.py` is the docx-pipeline orchestrator:
+  re-renders the same markdown, pre-computes per-finding chart
+  PNGs for top-N movers, applies page setup, hands both to the
+  translator. Sole entry point: `render_findings_docx`.
+- `briefing_pack/md_to_docx.py` is the markdown → docx translator:
+  pure function from `(Document, markdown_text, chart_lookup) →
+  Document mutated in place`. Reusable for any future md-backed
+  docx surface (Leads.docx, Groups.docx, etc.) without changes.
+- `sheets_export.py` unchanged from v1's Charts tab work — that
+  surface is already feature-complete and well-tested.
 
 After v1 closes, the path forward is unchanged: v2 (more chart
 recipes, demand-driven), v3 (Drive upload, OAuth-gated), v4 (full
