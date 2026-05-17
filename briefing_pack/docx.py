@@ -40,6 +40,14 @@ import matplotlib
 matplotlib.use("Agg")  # non-interactive backend; deterministic on a
                        # given host. See dev_notes design doc step 5
                        # for the known cross-host determinism caveat.
+
+# Silence matplotlib's "Using categorical units to plot a list of
+# strings..." INFO logs. We deliberately plot month labels (strings)
+# on a categorical x-axis; matplotlib's heuristic flags this as
+# "did you mean to parse them as dates?" every time. Harmless but
+# spammy — once per chart × 10 charts per run × every run.
+logging.getLogger("matplotlib.category").setLevel(logging.WARNING)
+
 import matplotlib.pyplot as plt
 import psycopg2.extras
 from docx import Document
