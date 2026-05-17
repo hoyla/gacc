@@ -311,4 +311,30 @@ Update this doc's "Status" line below when work starts.
 
 ## Status
 
-_(not yet started; next session pick-up)_
+**v1 slice steps 1–4 + 6 landed 2026-05-16**:
+[`f2b5c1c`](https://github.com/hoyla/meridian/commit/f2b5c1c)
+(stub module + `--docx` CLI flag) and
+[`d3f3bfc`](https://github.com/hoyla/meridian/commit/d3f3bfc)
+(24-month rolling-window charts). End-to-end run produces a real
+dress-rehearsal docx against today's DB; round-trip through Drive
+→ Google Docs verified for real-data charts (not just spike-synthetic).
+
+What remains in v1, in priority order:
+- **Step 5 — tests + determinism.** ~12-18 new tests, focused per
+  pure function (`_pick_eur_scale`, `_months_back`, `_month_iter`,
+  `_flow_label_for_subkind`, `_build_chart_png`) plus structural
+  assertions on the full docx render. Determinism: docx-internal
+  timestamps and openpyxl metadata aren't byte-stable across runs,
+  so the test bar is *structural* (same data → same paragraph count,
+  heading texts, image count) plus SHA256 stability of the chart
+  PNG bytes specifically (matplotlib Agg is deterministic per host).
+- **Xlsx Charts tab.** sheets_export.py extension to add a `Charts`
+  tab with native LineCharts for the top-N movers. Same data, same
+  ordering, mirrors the docx layout.
+- **Test for the empty-movers branch.** Cycles where no group passes
+  the editorial filter — handled in the renderer but not yet covered
+  by a test.
+
+After v1 closes, the path forward is unchanged: v2 (more chart
+recipes, demand-driven), v3 (Drive upload, OAuth-gated), v4 (full
+markdown-content parity, demand-driven).

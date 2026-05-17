@@ -174,6 +174,15 @@ the approach, not with the execution.
 Drive upload — OAuth leg deferred to Monday pending GCP project
 access restoration).
 
+**Real-data validation also PASSED** (2026-05-16 late evening):
+once the v1 production module landed (commits f2b5c1c, d3f3bfc),
+re-tested with a real-data .docx — 10 mover cards, 10 matplotlib
+charts at real-data density, uploaded to Drive, opened with Google
+Docs. Fidelity holds for actual content at production scale, not
+just the synthetic spike sample. The chart resolution + page-setup
+defaults (A4, 10mm margins, Mm(190) chart width) need no further
+tuning before the v3 OAuth-Drive integration lands.
+
 What was verified:
 
 - **`.docx` → Google Doc conversion preserves everything we need**:
